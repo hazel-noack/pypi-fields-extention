@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4	
+    - uses: actions/checkout@v2	
 
     - name: Build Extension for Firefox
       id: web-ext-build
@@ -31,7 +31,8 @@ jobs:
         apiSecret: ${{ secrets.FIREFOX_CLIENT_SECRET }}
 
     - name: Drop artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: 'Firefox Artefacts'
         path: ${{ steps.web-ext-sign.outputs.target }}
+        
