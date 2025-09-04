@@ -9,36 +9,31 @@ on:
       - '.github/workflows/publish.yaml'
 
 jobs:
-  sign:
-    name: "Release Extension"
+  build:
+    name: "Build"
     runs-on: ubuntu-latest
-
     steps:
-    - name: "Checkout"
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: "Checkout"
+        uses: actions/checkout@v4
 
-    - name: "Get version from manifest"
-      id: version
-      run: |
-        VERSION=$(jq -r '.version' manifest.json)
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "tag_name=v$VERSION" >> $GITHUB_OUTPUT
+      - name: "web-ext build"
+        id: web-ext-build
+        uses: kewisch/action-web-ext@v1
+        with:
+          cmd: build
+          filename: "{name}-{version}.xpi"
+          ignoreFiles: '[ "package.json","package-lock.json","yarn.lock" ]'
 
-    - name: "web-ext build"
-      id: web-ext-build
-      uses: kewisch/action-web-ext@v1
-      with:
-        cmd: build
-
-    - name: "Collect sources"
-      run: git archive --format=zip --output=sources.zip ${{ github.ref }}
-
-    - name: "Collect metadata"
-      id: metadata
-      run: echo "json=$(jq -c . < amo_metadata.json)" >> $GITHUB_OUTPUT
-
+      - name: "Upload Artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: target.xpi
+          path: ${{ steps.web-ext-build.outputs.target }}
+  
+  sign:
+    name: "Release"
+    runs-on: ubuntu-latest
+    steps:
     - name: "web-ext sign AMO"
       id: web-ext-sign
       uses: kewisch/action-web-ext@v1
@@ -54,42 +49,10 @@ jobs:
         apiSecret: ${{ secrets.FIREFOX_CLIENT_SECRET }}
         timeout: 900000
 
-    - name: "Create GitHub Release"
-      uses: softprops/action-gh-release@v1
-      if: success()
-      with:
-        files: |
-          ${{ steps.web-ext-sign.outputs.target }}/*
-          ${{ steps.web-ext-sign-tb.outputs.target }}/*
-          sources.zip
-        tag_name: ${{ steps.version.outputs.tag_name }}
-        name: Release ${{ steps.version.outputs.tag_name }}
-        body: |
-          ## PyPi Fields Extension ${{ steps.version.outputs.version }}
-          
-          Automatic release triggered by manifest update
-          
-          **Build Details:**
-          - Version: ${{ steps.version.outputs.version }}
-          - Commit: ${{ github.sha }}
-          - Triggered by: ${{ github.actor }}
-          - Build date: ${{ github.event.head_commit.timestamp }}
-          
-          **Download Links:**
-          - Firefox extension (.xpi)
-          - Source code (.zip)
-          
-          **More Information:**
-          [GitHub Repository](https://github.com/hazel-noack/pypi-fields-extention)
-        draft: false
-        prerelease: false
+    - name: "Attach release assets to release"
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: "Upload artifacts for debugging"
-      uses: actions/upload-artifact@v4
-      with:
-        name: 'Build Artifacts'
-        path: |
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh release upload ${{ github.event.release.tag_name }} \
           ${{ steps.web-ext-sign.outputs.target }}
-          sources.zip
+          
