@@ -14,6 +14,8 @@ function createInput(index, value) {
 
   // Create the input element and set its attributes
   const input = document.createElement("input");
+  input.type = "text";
+
   input.name = "template";
   if (value) {
     input.value = value;
