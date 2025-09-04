@@ -14,10 +14,6 @@ const templateValues = (() => {
   };
 })();
 
-function onError(error) {
-  console.log(`Error: ${error}`);
-}
-
 function duplicateElement(element, options = {}) {
   // Default options
   const {
@@ -76,6 +72,5 @@ getting.then(({ templates }) => {
     "pip install {name}",
     "{name}~={version}",
   ];
-  console.log(templateArray);
   templateArray.forEach(addText);
-}, onError);
+}, console.error);

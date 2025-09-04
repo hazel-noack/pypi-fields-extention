@@ -3,10 +3,6 @@ let currentIndex = -1;
 
 let templateArray = [];
 
-function onError(error) {
-  console.log(`Error: ${error}`);
-}
-
 function createInput(index, value) {
   const label = document.createElement("label");
   label.setAttribute("index", index);
@@ -92,4 +88,4 @@ getting.then(({ templates }) => {
   console.log(templateArray);
   templateArray.forEach(addInput);
   addInput("");
-}, onError);
+}, console.error);
