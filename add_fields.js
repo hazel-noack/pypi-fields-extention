@@ -57,19 +57,14 @@ function duplicateElement(element, options = {}) {
 }
 
 function addText(text) {
+  text = text.replace(/{(\w+)}/g, (match, key) => {
+    return templateValues[key] !== undefined ? templateValues[key] : match;
+  });
+
   const element = duplicateElement(templateElement);
   element.querySelector("span").innerText = text;
   container.appendChild(element);
 }
 
-addText("gock <333");
-addText("boobs <333");
-addText("meow <333");
-/*
-const duplicated = duplicateElement(
-  document.getElementsByClassName("package-header__pip-instructions")[0]
-);
-duplicated.querySelectorAll("span")[0].innerText = "gock <333";
-
-container.appendChild(duplicated);
-*/
+const templates = ["pip install {name}", "{name}~={version}"];
+templates.forEach(addText);
