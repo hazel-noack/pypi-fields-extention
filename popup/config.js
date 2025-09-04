@@ -1,6 +1,8 @@
 const container = document.getElementById("template-container");
 let currentIndex = -1;
 
+let templateArray = [];
+
 function createInput(index) {
   const label = document.createElement("label");
   label.setAttribute("index", index);
@@ -24,7 +26,7 @@ function onInput(event) {
 }
 
 function update(index, value) {
-  console.log(index, value);
+  templateArray[index] = value;
 
   if (value !== "" && index === currentIndex) {
     addInput();
@@ -33,9 +35,12 @@ function update(index, value) {
   if (value === "") {
     removeInput(index);
   }
+
+  console.log(templateArray, index, value);
 }
 
 function removeInput(index) {
+  templateArray.splice(index, 1);
   container.querySelector(`[index="${index}"]`).remove();
 
   Array.from(container.querySelectorAll("[index]")).forEach((element) => {
@@ -50,14 +55,17 @@ function removeInput(index) {
 function addInput() {
   currentIndex++;
 
-  lastInput = createInput(currentIndex);
-  container.appendChild(lastInput);
+  const input = createInput(currentIndex);
+  container.appendChild(input);
 
   let previousValue = "";
-  lastInput.querySelector("input").addEventListener("input", function (event) {
+  input.querySelector("input").addEventListener("input", function (event) {
     const value = event.target.value;
     if (value !== previousValue) {
-      update(parseInt(event.target.getAttribute("index")), value);
+      if (previousValue === "") {
+        templateArray.push("");
+      }
+      update(parseInt(input.getAttribute("index")), value);
     }
     previousValue = value;
   });

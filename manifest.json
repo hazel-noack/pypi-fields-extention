@@ -11,6 +11,8 @@
 
     "description": "Adds a field, to copy dependencies directly from PyPi.",
 
+    "permissions": ["storage"],
+
     "browser_action": {
         "default_icon": "icons/icon.svg",
         "default_title": "PyPi copy dependency",
