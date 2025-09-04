@@ -53,6 +53,8 @@ function removeInput(index) {
       element.setAttribute("index", otherIndex - 1);
     }
   });
+
+  currentIndex--;
 }
 
 function addInput(value) {
