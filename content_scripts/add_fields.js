@@ -55,10 +55,6 @@ function duplicateElement(element, options = {}) {
 }
 
 function addText(text) {
-  text = text.replace(/{(\w+)}/g, (match, key) => {
-    return templateValues[key] !== undefined ? templateValues[key] : match;
-  });
-
   const element = duplicateElement(templateElement);
 
   // create clipboard source to show untrimmed version, but trim the copy value
@@ -71,7 +67,7 @@ function addText(text) {
   const textElement = element.querySelector("span");
   textElement.innerText = text;
   textElement.removeAttribute("data-clipboard-target");
-  textElement.style.whiteSpace = "preserve";
+  textElement.style.whiteSpace = "preserve nowrap";
   container.appendChild(element);
 }
 
@@ -93,8 +89,12 @@ let getting = browser.storage.sync.get("templates");
 getting.then(({ templates }) => {
   templateElement.remove();
 
-  const templateArray = rightPadStrings(
-    templates || ["pip install {name}", "{name}~={version}"]
+  let templateArray = rightPadStrings(
+    (templates || ["pip install {name}", "{name}~={version}"]).map((template) =>
+      template.replace(/{(\w+)}/g, (match, key) => {
+        return templateValues[key] !== undefined ? templateValues[key] : match;
+      })
+    )
   );
   templateArray.forEach(addText);
 }, console.error);
