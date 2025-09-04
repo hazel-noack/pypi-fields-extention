@@ -43,6 +43,7 @@ jobs:
         uses: kewisch/action-web-ext@v1
         with:
           cmd: sign
+          source: ${{ steps.web-ext-build.outputs.target }}
           metaDataFile: amo_metadata.json
           approvalNotes: "Please find more information at https://github.com/hazel-noack/pypi-fields-extention"
           releaseNotes: "Release for version ${{ steps.version.outputs.version }}"
