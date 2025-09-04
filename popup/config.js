@@ -1,6 +1,7 @@
 const container = document.getElementById("template-container");
 let currentIndex = -1;
 
+const defaultTemplates = ["pip install {name}", "{name}~={version}"];
 let templateArray = [];
 
 function createInput(index, value) {
@@ -90,8 +91,23 @@ function addInput(value) {
 
 let getting = browser.storage.sync.get("templates");
 getting.then(({ templates }) => {
-  templateArray = templates || ["pip install {name}", "{name}~={version}"];
-  console.log(templateArray);
+  templateArray = templates || defaultTemplates;
   templateArray.forEach(addInput);
   addInput("");
 }, console.error);
+
+document.getElementById("reset").addEventListener("click", () => {
+  console.log("resetting templates to default");
+
+  templateArray = defaultTemplates;
+  while (container.firstChild) {
+    container.lastChild.remove();
+  }
+
+  templateArray.forEach(addInput);
+  addInput("");
+
+  browser.storage.sync.set({
+    templates: templateArray,
+  });
+});
