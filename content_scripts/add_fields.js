@@ -3,8 +3,6 @@ const templateElement = container.querySelector(
   '[data-controller="clipboard"]'
 );
 
-templateElement.remove();
-
 const templateValues = (() => {
   const headerTokens = container
     .querySelector("h1.package-header__name")
@@ -72,6 +70,8 @@ function addText(text) {
 
 let getting = browser.storage.sync.get("templates");
 getting.then(({ templates }) => {
+  templateElement.remove();
+
   const templateArray = templates || [
     "pip install {name}",
     "{name}~={version}",
