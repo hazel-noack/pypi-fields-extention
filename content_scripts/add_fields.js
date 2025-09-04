@@ -16,6 +16,10 @@ const templateValues = (() => {
   };
 })();
 
+function onError(error) {
+  console.log(`Error: ${error}`);
+}
+
 function duplicateElement(element, options = {}) {
   // Default options
   const {
@@ -66,5 +70,12 @@ function addText(text) {
   container.appendChild(element);
 }
 
-const templates = ["pip install {name}", "{name}~={version}"];
-templates.forEach(addText);
+let getting = browser.storage.sync.get("templates");
+getting.then(({ templates }) => {
+  const templateArray = templates || [
+    "pip install {name}",
+    "{name}~={version}",
+  ];
+  console.log(templateArray);
+  templateArray.forEach(addText);
+}, onError);
