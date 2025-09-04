@@ -3,18 +3,18 @@ name: Publish PyPi Fields extension
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
-    paths:
-      - 'manifest.json'
-      - '.github/workflows/publish.yaml'
+    tags:
+      - 'v*'
 
 jobs:
-  build:
-    name: "Build"
+  build-and-release:
+    name: "Build and Release"
     runs-on: ubuntu-latest
     steps:
     - name: "Checkout"
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: "web-ext build"
       id: web-ext-build
@@ -23,8 +23,10 @@ jobs:
         cmd: build
         filename: "{name}-{version}.xpi"
         ignoreFiles: '[ "package.json","package-lock.json","yarn.lock" ]'
+
     - name: "Collect sources"
       run: git archive --format=zip --output=sources.zip ${{ github.ref }}
+
     - name: "Collect metadata"
       id: metadata
       run: echo "json=$(jq -c . < amo_metadata.json)" >> $GITHUB_OUTPUT
@@ -36,32 +38,13 @@ jobs:
         path: |
           ${{ steps.web-ext-build.outputs.target }}
           sources.zip
-  
-  sign:
-    name: "Release"
-    runs-on: ubuntu-latest
-    needs: build
 
-    steps:
-    - name: "web-ext sign AMO"
-      id: web-ext-sign
-      uses: kewisch/action-web-ext@v1
+    - name: "Create Release"
+      uses: softprops/action-gh-release@v1
       with:
-        cmd: sign
-        source: ${{ steps.web-ext-build.outputs.target }}
-        sourceCode: sources.zip
-        metaDataFile: amo_metadata.json
-        approvalNotes: "Please find more information at https://github.com/hazel-noack/pypi-fields-extention"
-        releaseNotes: "Release for version ${{ steps.version.outputs.version }}"
-        license: GPL-3.0
-        licenseFile: LICENSE.md
-        apiKey: ${{ secrets.FIREFOX_API_KEY }}
-        apiSecret: ${{ secrets.FIREFOX_CLIENT_SECRET }}
-        timeout: 900000
-
-    - name: "Attach release assets to release"
+        files: |
+          ${{ steps.web-ext-build.outputs.target }}
+          sources.zip
+        generate_release_notes: true
       env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        gh release upload ${{ github.event.release.tag_name }} \
-          ${{ steps.web-ext-sign.outputs.target }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
