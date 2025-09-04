@@ -8,49 +8,86 @@ on:
       - 'manifest.json'
 
 jobs:
-  Firefox:
+  sign:
+    name: "Release"
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0  # Needed for automatic release notes
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Build Extension for Firefox
-      id: web-ext-build
-      uses: kewisch/action-web-ext@v1
-      with:
-        cmd: build
+      - name: "Get version from manifest"
+        id: version
+        run: |
+          VERSION=$(jq -r '.version' manifest.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag_name=v$VERSION" >> $GITHUB_OUTPUT
 
-    - name: 'Sign & publish'
-      id: web-ext-sign
-      uses: kewisch/action-web-ext@v1
-      with:
-        cmd: sign
-        channel: listed
-        source: ${{ steps.web-ext-build.outputs.target }}
-        apiKey: ${{ secrets.FIREFOX_API_KEY }}
-        apiSecret: ${{ secrets.FIREFOX_CLIENT_SECRET }}
+      - name: "web-ext build"
+        id: web-ext-build
+        uses: kewisch/action-web-ext@v1
+        with:
+          cmd: build
+          source: .
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: 'Firefox Artifacts'
-        path: ${{ steps.web-ext-sign.outputs.target }}
+      - name: "Collect sources"
+        run: git archive --format=zip --output=sources.zip ${{ github.ref }}
 
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
-      if: success()
-      with:
-        files: ${{ steps.web-ext-sign.outputs.target }}/*
-        tag_name: v${{ github.run_number }}
-        name: Release v${{ github.run_number }}
-        body: |
-          Automatic release for Firefox extension
-          - Build number: ${{ github.run_number }}
-          - Commit: ${{ github.sha }}
-          - Triggered by: ${{ github.actor }}
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Collect metadata"
+        id: metadata
+        run: echo "json=$(jq -c . < amo_metadata.json)" >> $GITHUB_OUTPUT
+
+      - name: "web-ext sign AMO"
+        id: web-ext-sign
+        uses: kewisch/action-web-ext@v1
+        with:
+          cmd: sign
+          metaDataFile: amo_metadata.json
+          approvalNotes: "Please find more information at https://github.com/hazel-noack/pypi-fields-extention"
+          releaseNotes: "Release for version ${{ steps.version.outputs.version }}"
+          license: GPL-3.0
+          licenseFile: LICENSE.md
+          apiKey: ${{ secrets.FIREFOX_API_KEY }}
+          apiSecret: ${{ secrets.FIREFOX_CLIENT_SECRET }}
+          timeout: 900000
+
+      - name: "Create GitHub Release"
+        uses: softprops/action-gh-release@v1
+        if: success()
+        with:
+          files: |
+            ${{ steps.web-ext-sign.outputs.target }}/*
+            ${{ steps.web-ext-sign-tb.outputs.target }}/*
+            sources.zip
+          tag_name: ${{ steps.version.outputs.tag_name }}
+          name: Release ${{ steps.version.outputs.tag_name }}
+          body: |
+            ## PyPi Fields Extension ${{ steps.version.outputs.version }}
+            
+            Automatic release triggered by manifest update
+            
+            **Build Details:**
+            - Version: ${{ steps.version.outputs.version }}
+            - Commit: ${{ github.sha }}
+            - Triggered by: ${{ github.actor }}
+            - Build date: ${{ github.event.head_commit.timestamp }}
+            
+            **Download Links:**
+            - Firefox extension (.xpi)
+            - Source code (.zip)
+            
+            **More Information:**
+            [GitHub Repository](https://github.com/hazel-noack/pypi-fields-extention)
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Upload artifacts for debugging"
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'Build Artifacts'
+          path: |
+            ${{ steps.web-ext-sign.outputs.target }}
+            sources.zip

@@ -12,7 +12,6 @@
     "homepage_url": "https://github.com/hazel-noack/pypi-fields-extention",
     "summary": "Adds a field, to copy dependencies directly from PyPi.",
     "description": "Adds a field, to copy dependencies directly from PyPi.",
-    "licence": "GPL-3.0",
     "categories": ["productivity", "utilities"],
     "screenshots": [
         {
