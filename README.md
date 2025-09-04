@@ -1,5 +1,7 @@
 # PyPi-Fields Firefox Extension
 
+<image src="icons/icon.svg" style="width: 3em; float: left; margin-right: 1em;"></image>
+
 A lightweight Firefox extension that enhances your PyPi package browsing experience by making the fields that lets you copy the command to install configurable.
 
 ## Features
