@@ -60,6 +60,12 @@ function removeInput(index) {
     }
   });
 
+  let newFocus = container.querySelector(`[index="${index}"]`);
+  if (!newFocus) {
+    newFocus = container.querySelector(`[index="${index - 1}"]`);
+  }
+  newFocus.focus();
+
   currentIndex--;
 }
 
