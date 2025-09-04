@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2	
+    - uses: actions/checkout@v4	
 
     - name: Build Extension for Firefox
       id: web-ext-build
@@ -35,4 +35,3 @@ jobs:
       with:
         name: 'Firefox Artefacts'
         path: ${{ steps.web-ext-sign.outputs.target }}
-        
