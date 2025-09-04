@@ -8,6 +8,11 @@
     <title>Configure PyPi copy fields</title>
 
     <style>
+      main {
+        padding: 1em;
+        width: 25em;
+      }
+
       #template-container>label:last-child {
         margin-bottom: 0;
       }
@@ -18,7 +23,12 @@
     </style>
   </head>
   <body>
-    <main class="container">
+    <main>
+      <h1>PyPi-Fields</h1>
+      <p>
+        Include <code>{name}</code> or version <code>{version}</code> in a field, to use the respective value on the page of a package. 
+      </p>
+
       <form id="template-container">
       </form>
     </main>
