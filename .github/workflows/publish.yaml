@@ -39,6 +39,8 @@ jobs:
   sign:
     name: "Release"
     runs-on: ubuntu-latest
+    needs: build
+
     steps:
     - name: "web-ext sign AMO"
       id: web-ext-sign
