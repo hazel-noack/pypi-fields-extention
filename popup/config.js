@@ -31,7 +31,7 @@ function onInput(event) {
 }
 
 function update(index, value) {
-  templateArray[index] = value;
+  templateArray[index] = value.trim();
 
   if (value !== "" && index === currentIndex) {
     addInput("");
