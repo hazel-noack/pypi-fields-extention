@@ -1,2 +1,2 @@
-# pipy-copy-dependency
+# pypi-copy-dependency
 
