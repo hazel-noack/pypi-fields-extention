@@ -46,6 +46,7 @@ jobs:
       with:
         cmd: sign
         source: ${{ steps.web-ext-build.outputs.target }}
+        sourceCode: sources.zip
         metaDataFile: amo_metadata.json
         approvalNotes: "Please find more information at https://github.com/hazel-noack/pypi-fields-extention"
         releaseNotes: "Release for version ${{ steps.version.outputs.version }}"
