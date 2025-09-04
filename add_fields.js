@@ -1,4 +1,20 @@
-document.body.style.border = "5px solid red";
+const container = document.getElementsByClassName("package-header__left")[0];
+const templateElement = container.querySelector(
+  '[data-controller="clipboard"]'
+);
+
+templateElement.remove();
+
+const templateValues = (() => {
+  const headerTokens = container
+    .querySelector("h1.package-header__name")
+    .innerText.split(" ");
+
+  return {
+    name: headerTokens[0],
+    version: headerTokens[1],
+  };
+})();
 
 function duplicateElement(element, options = {}) {
   // Default options
@@ -39,13 +55,6 @@ function duplicateElement(element, options = {}) {
 
   return clone;
 }
-
-const container = document.getElementsByClassName("package-header__left")[0];
-const templateElement = container.querySelector(
-  '[data-controller="clipboard"]'
-);
-
-templateElement.remove();
 
 function addText(text) {
   const element = duplicateElement(templateElement);
