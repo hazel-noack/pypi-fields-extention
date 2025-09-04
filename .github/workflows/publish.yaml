@@ -13,22 +13,26 @@ jobs:
     name: "Build"
     runs-on: ubuntu-latest
     steps:
-      - name: "Checkout"
-        uses: actions/checkout@v4
+    - name: "Checkout"
+      uses: actions/checkout@v4
 
-      - name: "web-ext build"
-        id: web-ext-build
-        uses: kewisch/action-web-ext@v1
-        with:
-          cmd: build
-          filename: "{name}-{version}.xpi"
-          ignoreFiles: '[ "package.json","package-lock.json","yarn.lock" ]'
+    - name: "web-ext build"
+      id: web-ext-build
+      uses: kewisch/action-web-ext@v1
+      with:
+        cmd: build
+        filename: "{name}-{version}.xpi"
+        ignoreFiles: '[ "package.json","package-lock.json","yarn.lock" ]'
 
-      - name: "Upload Artifact"
-        uses: actions/upload-artifact@v4
-        with:
-          name: target.xpi
-          path: ${{ steps.web-ext-build.outputs.target }}
+    - name: "Upload Artifact"
+      uses: actions/upload-artifact@v4
+      with:
+        name: target.xpi
+        path: ${{ steps.web-ext-build.outputs.target }}
+    - name: "Collect metadata"
+      id: metadata
+      run: echo "json=$(jq -c . < amo_metadata.json)" >> $GITHUB_OUTPUT
+
   
   sign:
     name: "Release"
@@ -55,4 +59,3 @@ jobs:
       run: |
         gh release upload ${{ github.event.release.tag_name }} \
           ${{ steps.web-ext-sign.outputs.target }}
-          
