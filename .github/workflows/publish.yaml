@@ -1,4 +1,4 @@
-name: Publish PyPi Fields extention
+name: Publish PyPi Fields extension
 
 on:
   workflow_dispatch:
@@ -12,7 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2	
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Needed for automatic release notes
 
     - name: Build Extension for Firefox
       id: web-ext-build
@@ -30,9 +32,25 @@ jobs:
         apiKey: ${{ secrets.FIREFOX_API_KEY }}
         apiSecret: ${{ secrets.FIREFOX_CLIENT_SECRET }}
 
-    - name: Drop artifacts
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: 'Firefox Artefacts'
+        name: 'Firefox Artifacts'
         path: ${{ steps.web-ext-sign.outputs.target }}
-        
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      if: success()
+      with:
+        files: ${{ steps.web-ext-sign.outputs.target }}/*
+        tag_name: v${{ github.run_number }}
+        name: Release v${{ github.run_number }}
+        body: |
+          Automatic release for Firefox extension
+          - Build number: ${{ github.run_number }}
+          - Commit: ${{ github.sha }}
+          - Triggered by: ${{ github.actor }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
