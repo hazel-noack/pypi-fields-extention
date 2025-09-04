@@ -1,9 +1,9 @@
 const container = document.getElementById("template-container");
 let currentIndex = -1;
 
-let templateArray = [];
+let templateArray = ["pip install {name}", "{name}~={version}"];
 
-function createInput(index) {
+function createInput(index, value) {
   const label = document.createElement("label");
   label.setAttribute("index", index);
   label.classList.add("template-input");
@@ -11,6 +11,9 @@ function createInput(index) {
   // Create the input element and set its attributes
   const input = document.createElement("input");
   input.name = "template";
+  if (value) {
+    input.value = value;
+  }
   input.placeholder = "enter new template";
   input.autocomplete = "given-name";
 
@@ -29,7 +32,7 @@ function update(index, value) {
   templateArray[index] = value;
 
   if (value !== "" && index === currentIndex) {
-    addInput();
+    addInput("");
   }
 
   if (value === "") {
@@ -52,13 +55,13 @@ function removeInput(index) {
   });
 }
 
-function addInput() {
+function addInput(value) {
   currentIndex++;
 
-  const input = createInput(currentIndex);
+  const input = createInput(currentIndex, value);
   container.appendChild(input);
 
-  let previousValue = "";
+  let previousValue = value;
   input.querySelector("input").addEventListener("input", function (event) {
     const value = event.target.value;
     if (value !== previousValue) {
@@ -71,4 +74,5 @@ function addInput() {
   });
 }
 
-addInput();
+templateArray.forEach(addInput);
+addInput("");
