@@ -2,13 +2,13 @@
     "manifest_version": 2,
     "name": "PyPi copy dependencies",
     "version": "1.0",
-    
+
     "description": "Adds a field, to copy dependencies directly from PyPi.",
 
     "content_scripts": [
         {
             "matches": ["*://pypi.org/project/*", "*://test.pypi.org/project/*"],
-            "js": ["add_fields.js"]
+            "js": ["content_scripts/add_fields.js"]
         }
     ]
 }
