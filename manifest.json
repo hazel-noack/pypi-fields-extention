@@ -3,7 +3,19 @@
     "name": "PyPi copy dependencies",
     "version": "1.0",
 
+    "icons": {
+        "32": "icons/icon.svg",
+        "64": "icons/icon.svg"
+    },
+
+
     "description": "Adds a field, to copy dependencies directly from PyPi.",
+
+    "browser_action": {
+        "default_icon": "icons/icon.svg",
+        "default_title": "PyPi copy dependency",
+        "default_popup": "popup/config.html"
+    },
 
     "content_scripts": [
         {
