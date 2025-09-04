@@ -60,17 +60,41 @@ function addText(text) {
   });
 
   const element = duplicateElement(templateElement);
-  element.querySelector("span").innerText = text;
+
+  // create clipboard source to show untrimmed version, but trim the copy value
+  const clipboardSource = document.createElement("span");
+  clipboardSource.setAttribute("data-clipboard-target", "source");
+  clipboardSource.innerText = text.trim();
+  clipboardSource.style.display = "none";
+  element.appendChild(clipboardSource);
+
+  const textElement = element.querySelector("span");
+  textElement.innerText = text;
+  textElement.removeAttribute("data-clipboard-target");
+  textElement.style.whiteSpace = "preserve";
   container.appendChild(element);
+}
+
+function rightPadStrings(stringsArray) {
+  if (!Array.isArray(stringsArray) || stringsArray.length === 0) {
+    return [];
+  }
+
+  // Find the length of the longest string
+  const maxLength = Math.max(...stringsArray.map((str) => str.length));
+
+  // Right-pad each string to match the maxLength
+  return stringsArray.map((str) => {
+    return str.padEnd(maxLength, " ");
+  });
 }
 
 let getting = browser.storage.sync.get("templates");
 getting.then(({ templates }) => {
   templateElement.remove();
 
-  const templateArray = templates || [
-    "pip install {name}",
-    "{name}~={version}",
-  ];
+  const templateArray = rightPadStrings(
+    templates || ["pip install {name}", "{name}~={version}"]
+  );
   templateArray.forEach(addText);
 }, console.error);
