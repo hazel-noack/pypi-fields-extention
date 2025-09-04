@@ -41,9 +41,26 @@ function duplicateElement(element, options = {}) {
 }
 
 const container = document.getElementsByClassName("package-header__left")[0];
-console.log(container);
+const templateElement = container.querySelector(
+  '[data-controller="clipboard"]'
+);
 
+templateElement.remove();
+
+function addText(text) {
+  const element = duplicateElement(templateElement);
+  element.querySelector("span").innerText = text;
+  container.appendChild(element);
+}
+
+addText("gock <333");
+addText("boobs <333");
+addText("meow <333");
+/*
 const duplicated = duplicateElement(
   document.getElementsByClassName("package-header__pip-instructions")[0]
 );
+duplicated.querySelectorAll("span")[0].innerText = "gock <333";
+
 container.appendChild(duplicated);
+*/
