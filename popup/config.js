@@ -1,7 +1,11 @@
 const container = document.getElementById("template-container");
 let currentIndex = -1;
 
-let templateArray = ["pip install {name}", "{name}~={version}"];
+let templateArray = [];
+
+function onError(error) {
+  console.log(`Error: ${error}`);
+}
 
 function createInput(index, value) {
   const label = document.createElement("label");
@@ -38,6 +42,10 @@ function update(index, value) {
   if (value === "") {
     removeInput(index);
   }
+
+  browser.storage.sync.set({
+    templates: templateArray,
+  });
 
   console.log(templateArray, index, value);
 }
@@ -76,5 +84,10 @@ function addInput(value) {
   });
 }
 
-templateArray.forEach(addInput);
-addInput("");
+let getting = browser.storage.sync.get("templates");
+getting.then(({ templates }) => {
+  templateArray = templates || ["pip install {name}", "{name}~={version}"];
+  console.log(templateArray);
+  templateArray.forEach(addInput);
+  addInput("");
+}, onError);
