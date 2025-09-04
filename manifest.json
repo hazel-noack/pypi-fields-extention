@@ -8,8 +8,21 @@
         "64": "popup/icon.svg"
     },
 
-
+    "author": "Hazel Noack",
+    "homepage_url": "https://github.com/hazel-noack/pypi-fields-extention",
+    "summary": "Adds a field, to copy dependencies directly from PyPi.",
     "description": "Adds a field, to copy dependencies directly from PyPi.",
+
+    "categories": ["productivity", "utilities"],
+    "screenshots": [
+        {
+            "src": "screenshots/extension.png",
+            "sizes": "1110x514",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "showing the extension"
+        }
+    ],
 
     "permissions": ["storage"],
 

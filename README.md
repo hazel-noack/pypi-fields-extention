@@ -10,7 +10,7 @@ A lightweight Firefox extension that enhances your PyPi package browsing experie
 - **Templating**: You can display any string you want, and use the variables `name` and `version`
 - **Minimal Interface**: Clean, unobtrusive integration with PyPi package pages
 
-![screenshot of the browser extension](screenshots/extention.png)
+![screenshot of the browser extension](screenshots/extension.png)
 
 
 
